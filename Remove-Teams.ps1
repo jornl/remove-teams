@@ -23,6 +23,8 @@ function UninstallTeams {
       }
 
       Write-Information "Successfully removed Teams from $($Path)"
+
+      Get-AppxPackage -Name MicrosoftTeams | Remove-AppxPackage
     }
   }
 }
@@ -32,20 +34,24 @@ $TeamsPaths = @(
 )
 
 $TeamsPaths | ForEach-Object {
-  if (Test-Path -Path $_) {
-    UninstallTeams -Path $_
-  } else {
+  if (-not(Test-Path -Path $_)) {
     Write-Information "Older Teams installations not found."
+  } else {
+    UninstallTeams -Path $_
   }
 }
 
-$MachineWideInstaller = Get-CimInstance -ClassName Win32_Product | Where-Object { $_.Name -eq "Teams Machine-Wide Installer"}
+
+
+$MachineWideInstaller = Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -eq "Teams Machine-Wide Installer"}
 if ($null -ne $MachineWideInstaller) {
   Write-Information "Removing MachineWide Installer.."
-  $Uninstaller = $MachineWideInstaller | Invoke-CimMethod Uninstall
+  $Uninstaller = $MachineWideInstaller.Uninstall()
   if ($Uninstaller.ReturnValue -eq 0) {
-    Write-Information "Successfully removed Teams MachineWide Installer"
+    Write-Information "Successfully removed Teams MachineWide Installer."
   } else {
-    Write-Error "Failed to remove Teams MachineWide Installer. $($result.ReturnValue)"
+    Write-Warning "Unable to remove Teams MachineWide Installer. ErrorCode: $($Uninstaller.ReturnValue)"
   }
+} else {
+  Write-Information "No MachineWide Installers found."
 }
