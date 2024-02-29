@@ -23,9 +23,9 @@ function UninstallTeams {
       }
 
       Write-Information "Successfully removed Teams from $($Path)"
-
-      Get-AppxPackage -Name MicrosoftTeams | Remove-AppxPackage
     }
+
+
   }
 }
 
@@ -41,8 +41,6 @@ $TeamsPaths | ForEach-Object {
   }
 }
 
-
-
 $MachineWideInstaller = Get-WmiObject -Class Win32_Product | Where-Object { $_.Name -eq "Teams Machine-Wide Installer"}
 if ($null -ne $MachineWideInstaller) {
   Write-Information "Removing MachineWide Installer.."
@@ -55,3 +53,6 @@ if ($null -ne $MachineWideInstaller) {
 } else {
   Write-Information "No MachineWide Installers found."
 }
+
+Get-AppxPackage -Name "MicrosoftTeams" -AllUsers | Remove-AppxPackage -AllUsers
+Get-AppProvisionedPackage -Online | Where-Object { $_.PackageName -like "MicrosoftTeams*" } | Remove-AppProvisionedPackage -Online
