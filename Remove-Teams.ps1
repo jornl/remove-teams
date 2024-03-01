@@ -24,13 +24,17 @@ function UninstallTeams {
 
       Write-Information "Successfully removed Teams from $($Path)"
     }
+  }
 
-
+  End {
+    if ($PSCmdlet.ShouldProcess($Path, ("Removing '{0}'" -f $Path))) {
+      Remove-Item -Path $Path -Recurse
+    }
   }
 }
 
 $TeamsPaths = @(
-  "$($env:LOCALAPPDATA)\Microsoft\Teams"
+  (Get-ChildItem -Path "C:\Users\*\AppData\Local\Microsoft\Teams").FullName
 )
 
 $TeamsPaths | ForEach-Object {

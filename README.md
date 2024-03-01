@@ -8,7 +8,7 @@ To add a custom path, locate the $TeamsPaths array definition in the script and 
 
 ```powershell
 $TeamsPaths = @(
-  "$($env:LOCALAPPDATA)\Microsoft\Teams",
+  (Get-ChildItem -Path "C:\Users\*\AppData\Local\Microsoft\Teams").FullName,
   "C:\Custom\Path\To\Teams"
 )
 ```
